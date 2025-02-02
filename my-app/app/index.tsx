@@ -5,41 +5,62 @@ import * as Location from "expo-location";
 
 export default function App() {
   const [mapRegion, setMapRegion] = useState({
-    latitude: 15.2993, // Goa's latitude
-    longitude: 74.124, // Goa's longitude
-    latitudeDelta: 0.5, // Zoom level
-    longitudeDelta: 0.5, // Zoom level
+    latitude: 15.2993,
+    longitude: 74.124,
+    latitudeDelta: 0.5,
+    longitudeDelta: 0.5,
   });
+
+  const [location, setLocation] = useState(null);
+  const [sosMessage, setSosMessage] = useState(""); // State to hold SOS message
 
   const userLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      setErrorMsg("Permission denied to access location");
+      setSosMessage("Permission denied to access location");
+      return;
     }
-    let location = await Location.getCurrentPositionAsync();
+    let loc = await Location.getCurrentPositionAsync();
+    setLocation(loc);
     setMapRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude,
       latitudeDelta: 0.5,
       longitudeDelta: 0.5,
     });
-    console.log(location.coords.latitude, location.coords.longitude);
   };
 
   useEffect(() => {
     userLocation();
   }, []);
 
+  const showMessage = () => {
+    if (location) {
+      setSosMessage(
+        `SOS Message Clicked: Current location is (${location.coords.latitude}, ${location.coords.longitude})`
+      );
+    } else {
+      setSosMessage("SOS Message Clicked: Location not found");
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <MapView style={styles.map} region={mapRegion}>
-        <Marker coordinate={mapRegion} title="Marker" />
-      </MapView>
-      <Button title="Get Location" onPress={userLocation} />
-      <TouchableOpacity style={styles.sos_btn} onPress={userLocation}>
-        <Text style={styles.sos_text}>Send SOS Message</Text>
-      </TouchableOpacity>
-    </View>
+    <>
+      {sosMessage !== "" && (
+        <View style={styles.messageBox}>
+          <Text style={styles.messageText}>{sosMessage}</Text>
+        </View>
+      )}
+      <View style={styles.container}>
+        <MapView style={styles.map} region={mapRegion} showsMyLocationButton>
+          <Marker coordinate={mapRegion} title="Marker" />
+        </MapView>
+        <Button title="Get Location" onPress={userLocation} />
+        <TouchableOpacity style={styles.sos_btn} onPress={showMessage}>
+          <Text style={styles.sos_text}>Send SOS Message</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 }
 
@@ -64,5 +85,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  messageBox: {
+    backgroundColor: "black",
+    padding: 10,
+    margin: 10,
+    borderRadius: 10,
+  },
+  messageText: {
+    color: "white",
+    fontSize: 16,
   },
 });
