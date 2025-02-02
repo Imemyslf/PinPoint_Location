@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 
 export default function App() {
   const [mapRegion, setMapRegion] = useState({
-    latitude: 15.2993,
+    latitude: 15.1093,
     longitude: 74.124,
     latitudeDelta: 0.5,
     longitudeDelta: 0.5,
@@ -42,6 +42,10 @@ export default function App() {
     } else {
       setSosMessage("SOS Message Clicked: Location not found");
     }
+    // 🔹 Clear the message after 5 seconds
+    setTimeout(() => {
+      setSosMessage("");
+    }, 5000);
   };
 
   return (
