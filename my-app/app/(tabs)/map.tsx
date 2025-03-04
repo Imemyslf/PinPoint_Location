@@ -3,7 +3,7 @@ import MapView, { Marker } from "react-native-maps";
 import { StyleSheet, View, Button, TouchableOpacity, Text } from "react-native";
 import * as Location from "expo-location";
 
-export default function App() {
+export default function MapLocation() {
   const [mapRegion, setMapRegion] = useState({
     latitude: 15.1093,
     longitude: 74.124,
